@@ -1,5 +1,6 @@
 import re #regular expressions
 import argparse
+import ast
 from collections import defaultdict
 
 def parse_gfa(input_path):
@@ -24,9 +25,17 @@ def parse_gfa(input_path):
                 _, sid, seq, comment = line.strip().split('\t', 3)
                 sequences[sid] = seq
 
-                # hier könnte man noch irgendwie die metadata verändern
-                # aktuell enthält sie nämlich topic: ... was vllt schwierig wird, weil so auch die metadata und genes anfängt
-                metadata[sid] = comment 
+                # Metadata: samples / tags rausfiltern
+                # Suche nach dem ersten Vorkommen einer Liste in eckigen Klammern (z. B. ['a', 'b'])
+                match = re.search(r'\[.*?\]', comment)
+
+                if match:
+                    list_str = match.group(0) # extracts as string
+                    samples = ast.literal_eval(list_str) # wandelt ihn um in Liste
+                else: samples = []
+
+                samples_line = ','.join(samples) # you must not have spaces in the samplen names
+                metadata[sid] = samples_line
 
             elif line.startswith('L'):
                 # Link/edge line
@@ -81,4 +90,5 @@ if __name__ == "__main__":
 
     # Parse and convert
     sequences, metadata, links = parse_gfa(args.input_gfa)
+
     write_custom_fa(args.output_fa, sequences, metadata, links)
