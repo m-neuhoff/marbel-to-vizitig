@@ -3,7 +3,7 @@ import argparse
 import ast
 from collections import defaultdict
 
-def parse_gfa(input_path):
+def parse_gfa(input_path, num_of_samples):
     """
     Parse a GFA-like file and extract:
     - S lines (sequences and optional metadata)
@@ -15,6 +15,7 @@ def parse_gfa(input_path):
     """
     sequences = {} # here I create the keys myself, same for metadata
     metadata = {} 
+    abundance = {}
     links = defaultdict(list) # safety because otherwise I would have to check if key exists
 
     with open(input_path, 'r') as f:
@@ -37,6 +38,14 @@ def parse_gfa(input_path):
                 samples_line = ','.join(samples) # you must not have spaces in the samplen names
                 metadata[sid] = samples_line
 
+                # etwas das sich sum zieht
+                match = re.search(r"sum:\s*([\d\.]+)", comment)
+
+                # den rechenschritt könnte man auch woanders machen
+                if match:
+                    sum_int = int(match.group(1))
+                    abundance[sid]=sum_int/num_of_samples
+
             elif line.startswith('L'):
                 # Link/edge line
                 # Format: L <from_id> <from_orient> <to_id> <to_orient> <overlap>
@@ -45,16 +54,17 @@ def parse_gfa(input_path):
                 # Store the link in "L:<from_strand>:<to_id>:<to_strand>" format
                 links[from_id].append(f"L:{from_orient}:{to_id}:{to_orient}")
     
-    return sequences, metadata, links
+    return sequences, metadata, links, abundance
 
-def write_custom_fa(output_path, sequences, metadata, links):
+def write_custom_fa(output_path, sequences, metadata, links, abundance):
     """
     Write the converted output to custom .fa-like format.
     Header includes:
-        >unitig_id metadata: ... L:... L:...
+        >unitig_id metadata: ... L:... L:... km:f:...
     Followed by:
        sequence
     """
+
     with open(output_path, 'w') as out:
         for sid in sequences:
             # speicher erstmal einzelne felder in liste
@@ -72,6 +82,10 @@ def write_custom_fa(output_path, sequences, metadata, links):
             # rückgabe [] weil list += None Fehler geben würde
             header_parts += links.get(sid, []) 
 
+            # add abundance
+            if abundance.get(sid):
+                header_parts.append(f"km:f:{abundance[sid]}")
+
             # Join all parts with space as separator
             header_line = ' '.join(header_parts)
 
@@ -79,16 +93,25 @@ def write_custom_fa(output_path, sequences, metadata, links):
             out.write(header_line + '\n')
             out.write(sequences[sid] + '\n')
 
+def calc_mean(num_of_samples, sums):
+    """
+    calculates sums into mean abundances
+    and gives them back as a new dictionary
+    ? soll das so sein?
+    """
+    
+
 # zur ausführung
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert GFA file to custom FASTA-like format.")
     parser.add_argument("input_gfa", help="Pfad zur Eingabe-GFA-Datei")
     parser.add_argument("output_fa", help="Pfad zur Ausgabedatei")
+    parser.add_argument("num_of_samples", type=int, help="Anzahl der verwendeten Samples")
 
     args = parser.parse_args()
 
     # Parse and convert
-    sequences, metadata, links = parse_gfa(args.input_gfa)
+    sequences, metadata, links, abundance = parse_gfa(args.input_gfa, args.num_of_samples)
 
-    write_custom_fa(args.output_fa, sequences, metadata, links)
+    write_custom_fa(args.output_fa, sequences, metadata, links, abundance)
