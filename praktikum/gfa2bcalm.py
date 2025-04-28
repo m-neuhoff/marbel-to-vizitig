@@ -16,6 +16,7 @@ def parse_gfa(input_path, num_of_samples):
     sequences = {} # here I create the keys myself, same for metadata
     metadata = {} 
     abundance = {}
+    sums = {}
     links = defaultdict(list) # safety because otherwise I would have to check if key exists
 
     with open(input_path, 'r') as f:
@@ -44,6 +45,7 @@ def parse_gfa(input_path, num_of_samples):
                 # den rechenschritt könnte man auch woanders machen
                 if match:
                     sum_int = int(match.group(1))
+                    sums[sid] = sum_int
                     abundance[sid]=sum_int/num_of_samples
 
             elif line.startswith('L'):
@@ -54,9 +56,9 @@ def parse_gfa(input_path, num_of_samples):
                 # Store the link in "L:<from_strand>:<to_id>:<to_strand>" format
                 links[from_id].append(f"L:{from_orient}:{to_id}:{to_orient}")
     
-    return sequences, metadata, links, abundance
+    return sequences, metadata, links, abundance, sums
 
-def write_custom_fa(output_path, sequences, metadata, links, abundance):
+def write_custom_fa(output_path, sequences, metadata, links, abundance, sums):
     """
     Write the converted output to custom .fa-like format.
     Header includes:
@@ -82,6 +84,10 @@ def write_custom_fa(output_path, sequences, metadata, links, abundance):
             # rückgabe [] weil list += None Fehler geben würde
             header_parts += links.get(sid, []) 
 
+            # add sums
+            if sums.get(sid):
+                header_parts.append(f"KC:i:{sums[sid]}")
+
             # add abundance
             if abundance.get(sid):
                 header_parts.append(f"km:f:{abundance[sid]}")
@@ -93,13 +99,6 @@ def write_custom_fa(output_path, sequences, metadata, links, abundance):
             out.write(header_line + '\n')
             out.write(sequences[sid] + '\n')
 
-def calc_mean(num_of_samples, sums):
-    """
-    calculates sums into mean abundances
-    and gives them back as a new dictionary
-    ? soll das so sein?
-    """
-    
 
 # zur ausführung
 
@@ -112,6 +111,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Parse and convert
-    sequences, metadata, links, abundance = parse_gfa(args.input_gfa, args.num_of_samples)
+    sequences, metadata, links, abundance, sums = parse_gfa(args.input_gfa, args.num_of_samples)
 
-    write_custom_fa(args.output_fa, sequences, metadata, links, abundance)
+    write_custom_fa(args.output_fa, sequences, metadata, links, abundance, sums)
