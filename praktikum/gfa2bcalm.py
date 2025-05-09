@@ -70,7 +70,7 @@ def write_custom_fa(output_path, sequences, metadata, links, abundance, sums):
     with open(output_path, 'w') as out:
         for sid in sequences:
             # speicher erstmal einzelne felder in liste
-            header_parts = [f">{sid}"]
+            header_parts = [f">{sid} genes: GENE0"]
 
             # Add metadata (if exists)
             # get gibt zwar den wert zum schlüssel ist hier aber nur als test, ob ein eintrag existiert
@@ -84,7 +84,7 @@ def write_custom_fa(output_path, sequences, metadata, links, abundance, sums):
             # rückgabe [] weil list += None Fehler geben würde
             header_parts += links.get(sid, []) 
 
-            # add sums
+            # add sums, lässt sich vllt nicht verarbeiten
             if sums.get(sid):
                 header_parts.append(f"KC:i:{sums[sid]}")
 
