@@ -56,6 +56,8 @@ small_ex:
 	bash -c "source venv/bin/activate;python3 -m vizitig color -f examples/abundances.fa -d sample -m sample3 -abundances mini_bcalm"
 ```
 
+sample-files können auch fna oder normales fasta sein (und natürlich bcalm fasta für abundancen) aber keine fastq
+
 # Nutzung des webclients
 
 Im webclient kann man das auch alles per Mouseklick machen außer -abundances
