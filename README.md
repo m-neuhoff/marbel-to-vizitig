@@ -13,6 +13,8 @@ Das script lässt sich so aus dem Terminal verwenden:
 
 num_of_samples ist dabei die Anzahl aller untersuchter samples. Aber die Rechnung stimmt noch nicht und daher auch die mean abundance noch nicht
 
+für das gfa2vizitig.py: --sample_dir kann angegeben werden. Dort werden generierten sample-dateien abgelegt. Evtl. umschreiben, sodass es bei keiner Ordnerangabe die Funktion nicht ausführt, falls man es gar nicht braucht?
+
 # Hinweis bei Windows->Linux 
 
 ```bash
