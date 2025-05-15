@@ -85,7 +85,7 @@ def write_transcript_fasta(transcript_to_sids, sequences, output_path):
         for transcript_id, sids in transcript_to_sids.items():
             for sid in sids:
                 if sequences.get(sid):  # wird None wenn Schlüssel nicht existiert
-                    out_fasta.write(f'>{transcript_id}\n{sequences[sid]}\n')
+                    out_fasta.write(f'>|XX_{transcript_id}|:0-0(unknown)\n{sequences[sid]}\n')
                 else: print(f"{sid} existiert in sequences nicht")
 
 
@@ -199,3 +199,5 @@ if __name__ == "__main__":
         print("transcript_to_sids is an empty dict")
     # schlüssel_typen = {type(key) for key in sequences.keys()}
     # print(f"Die Schlüssel im Dict haben den Typ {schlüssel_typen}")
+    
+    
