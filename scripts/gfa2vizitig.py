@@ -178,7 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("input_gfa", help="Pfad zur Eingabe-GFA-Datei")
     parser.add_argument("output_fa", help="Pfad zur Ausgabedatei")
     parser.add_argument("num_of_samples", type=int, help="Anzahl der verwendeten Samples")
-    parser.add_argument("--sample_dir", default="sample_fas", help="Ordner für pro-Sample FASTA-Dateien")
+    parser.add_argument("--sample_dir", default="samples", help="Ordner für pro-Sample FASTA-Dateien")
     parser.add_argument("output_transcript")
     parser.add_argument("gaf_path")
 
