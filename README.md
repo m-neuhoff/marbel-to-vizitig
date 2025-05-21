@@ -28,9 +28,9 @@ Beispiel:
 
 Im Ordner scripts befinden sich zwei Versionen meines Python-Skripts:
 
-    Gfa2bcalm konvertiert lediglich GFA zu FASTA.
+- Gfa2bcalm konvertiert lediglich GFA zu FASTA.
 
-    Gfa2vizitig konvertiert GFA zu FASTA, erzeugt die für das Einfärben benötigten Sample-Dateien und generiert eine Transkriptdatei mit den Informationen aus dem Alignment mit GraphAligner. Im bash-Skript wird letzteres verwendet.
+- Gfa2vizitig konvertiert GFA zu FASTA, erzeugt die für das Einfärben benötigten Sample-Dateien und generiert eine Transkriptdatei mit den Informationen aus dem Alignment mit GraphAligner. Im bash-Skript wird letzteres verwendet.
 
 how2vizitig.sh ist ein Beispiel, wie die Vizitig-CLI verwendet werden kann.
 
@@ -50,18 +50,19 @@ Das script enthält neben dem Argument-Parser im main, als Funktionen einen Date
 ### Input-Formate
 
 Der Graph als fasta-Datei enthält ID, die Namen der Samples als metadata, die Links, Abundance und die Sequence;
-in der Art wie bcalm es erzeugen würde: 
+in der Art wie bcalm es erzeugen würde. Die Einträge sind durch Leerezeichen getrennt. "genes: GENE0" ist zunächst nur ein Platzhalter, der auch weggelassen werden könnte.
 ```
-><id> metadata: <sample1, sample2, ...> KC:i:<abundance> km:f:<abundance> L:<+/->:<other id>:<+/->/n
+><id> genes: GENE0 metadata: <sample1, sample2, ...> KC:i:<abundance> km:f:<abundance> L:<+/->:<other id>:<+/->/n
 <sequence>
 ```
-Vizitig ließt allerdings nur das km:f: Feld ein. KC:i: wird ignoriert.
+Beispiele wie das Format aussieht finden sich im Vizitig-Repo. Auffällig ist, dass nur manche Unitigs eine abundance-Angaben haben. Mein Script macht dagegen für jeden Unitig einen Abundance-Eintrag. 
+Vizitig ließt außerdem nur das km:f: Feld. KC:i: wird ignoriert, könnte also auch weggelassen werden.
 Vizitig erstellt aus dem fasta-Graph einen db-Graph. 
+
 Um nach Samples zu filtern, müssen die samples als eigene fasta-Dateien vorliegen, die metadata-Spalte reicht nicht aus.
 
 Die fasta-files von Exons müssen bestimmte header lines haben: `>|XX_DY220_RS02960|:0-0(unknown)`
 fasta-files von Transcripten haben im header nur die TranscriptID stehen: `>DY220_RS02960`
-
 
 ### Nutzung von vizitig CLI
 
