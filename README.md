@@ -6,12 +6,18 @@ Dieses Repository zeigt, wie man von einem Marbel-Datensatz zu einem colored De-
 
 Folgende Programme müssen installiert sein (die von mir verwendeten Versionen stehen in Klammern):
 
-- marbel
-- dbg
-- GraphAligner
-- vizitig
+- marbel (0.1.0)
+- dbg (0.5.0)
+- GraphAligner (1.0.17)
+- vizitig (1.0.5)
 
-Ich habe Marbel in einer Conda-Umgebung installiert, dbg durch Klonen des Repositories (die Installation dann nach Elenas mündl. Anleitung), GraphAligner ebenfalls über Conda (außerhalb einer Umgebung) und Vizitig durch Klonen des Repositories und Installation gemäß der Anleitung im entsprechenden Repository.
+Ich habe Marbel in einer Conda-Umgebung installiert, dbg durch Klonen des Repositories (die Installation dann nach Elenas mündl. Anleitung), GraphAligner ebenfalls über Conda (außerhalb einer Umgebung) und Vizitig durch Klonen des Repositories und Installation gemäß der Anleitung im entsprechenden Repository, da pip nicht die aktuelle Version hat und somit viel weniger Funktionen (um zu überprüfen, ob pip mittlerweile auch 1.0.5 hat: `pip index versions vizitig`). Ich habe vizitig so installiert:
+
+```bash
+git clone https://gitlab.inria.fr/pydisk/examples/vizitig
+cd vizitig
+make install
+```
 
 ## Inhalt und Verwendung dieses Repos
 
@@ -66,13 +72,7 @@ fasta-files von Transcripten haben im header nur die TranscriptID stehen: `>DY22
 
 ### Nutzung von vizitig CLI
 
-installiere vizitig 1.0.5 nur so (um zu überprüfen, ob pip mittlerweile auch 1.0.5 hat: `pip index versions vizitig`):
-```bash
-git clone https://gitlab.inria.fr/pydisk/examples/vizitig
-cd vizitig
-make install
-```
-Es wird ein vizitig-Ordner kopiert. Um vizitig zu verwenden, gehe in den Order und 
+Um vizitig zu verwenden, gehe in den vizitig Order und 
 ```...vizitig$ source venv/bin/activate```
 
 Anschließend wird ein Graph wie unten beschrieben erstellt. Das kann anhand von bigger_example auch in how2vizitig.sh nachgeschaut werden. 
@@ -124,6 +124,7 @@ In der Query können logische Ausdrücke verwendet werden, wie im Repo beschrieb
 
 Der Metadata-Explorer (rechts) zeigt die Metadata-Typen, die in dem aktuellen Graph enthalten sind: z.B. Color, Transcripts, Gene und Exon. Bei großen Graphen kann das Laden länger dauern. Der Explorer zeigt die unique values der Metadaten. Durch anklicken werden sie in das Query-Feld geschrieben. Wenn eine annot.file eingegeben wird, wird das genes: Feld befüllt, das mit Gene(X) gefiltert werden kann. Wenn Transcript-Files ohne annotations-file verwendet wurden wie bei mir, kann nach der TranscriptID gefiltert werden. 
 
+Im folgenden zu sehen sind zwei 
 
 ### Troubles
 
@@ -141,3 +142,5 @@ unexpected symbols:
 file my_ex_data/output_ex_sampl_kc_km.fa # überprüfen ob die fasta files Windows-Endung (ACII text, with CRLF line terminators) haben
 dos2unix -h # umwandeln oder in VS code unten rechts auf CRLF zu LF wechseln und speichern
 ```
+
+Bei Problemen mit Github-Authentifizierung auf dem cli: Die github-Authentifikation funktioniert über den jupyterhub VSCode sehr einfach; es öffnet sich nach beliebigen git-Befehl ein Fenster mit dem normalem Login.
