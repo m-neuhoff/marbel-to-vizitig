@@ -2,6 +2,10 @@
 
 Dieses Repository zeigt, wie man von einem Marbel-Datensatz zu einem colored De-Bruijn-Graphen gelangt und diesen im Webclient von Vizitig visualisieren kann. Es enthält neben Slurm-Skripten zur Verwendung der verschiedenen Programme mein Skript zur Konvertierung von Graphen im GFA-Format in ein bcalm-style FASTA-Format. Außerdem macht es den ersten Schritt zu einem Vergleich der Ergebnisse beim Alignen von Transkripten mit GraphAligner vs Vizitig.
 
+In der Abbildung zu sehen ist die Reihenfolge der Programme und ihr Zusammenhang untereinander dargestellt. 
+
+![Alt-Text](/bilder/prozess.PNG)
+
 ## Dependencies & Installation
 
 Folgende Programme müssen installiert sein (die von mir verwendeten Versionen stehen in Klammern):
@@ -47,9 +51,10 @@ Die Datei in file_list_csv wird von dbg verwendet.
 ### Was macht gfa2vizitig?
 
 Das script enthält neben dem Argument-Parser im main, als Funktionen einen Datei-Parser für gaf und einen für gfa. In diesen Datei-Parsern werden die relevanten Informationen in Dictionaries gelegt, i.d.R. mit der Segment bzw. Node-ID als Schlüssel. Auf diese Dictionaries greifen die verschiedenen write-Funktionen zu: 
+
 - Eine schreibt den Graph als fasta, das Input-Format für vizitig.
 - Eine andere generiert die Sample-Dateien, mit denen vizitig später den Graphen colort. Dazu kopiert sie alle Unitig-Zeilen, bei denen Sample x in den metadaten steht, in eine eigene Datei Sample_x.fa. 
-- Eine dritte Funktion zieht aus dem gaf-Graph die Info, über welche Nodes ein Transcript läuft, um daraus eine Transcript-fasta-Datei zu generieren. 
+- Eine dritte Funktion zieht aus dem gaf-Graph die Info, über welche Nodes ein Transcript läuft, um daraus eine Transcript-fasta-Datei zu generieren, allerdings im Format für Exon-Dateien. Damit später Exon und Transcript in den Graph geladen werden können, um unterschiede im Alignment von  Graphaligner und vizitig sichtbar zu machen. Hier liegt aber noch ein Fehler, siehe To do.
 
 ## Über vizitig
 
@@ -117,14 +122,24 @@ Nach klick auf den Graphen wird eine neue Seite geladen. Folgender Ablauf ist si
 3. im Graphen fenster add action und den erstellen filter auswählen, dann kann entsprechend eingefärbt werden
 4. um Filter aufzuheben "show action" und remove ggf. mehrfach klicken
 
+! by default werden max. 1000 Nodes pro Query gefetched
 ! Query nimmt für A= nur integer
 ! es wird nur nach der km:f: Abundance gefiltert siehe https://gitlab.inria.fr/vizisoft/vizitig/-/blob/main/vizitig/parsing.py
 
-In der Query können logische Ausdrücke verwendet werden, wie im Repo beschrieben. Es können mehrere Actions übereinander liegen, wenn sie dieselben Nodes betreffen, ist nur die zuletzt getätigte sichtbar. Transparency war bei mir oft nicht sichtbar.
+In der Query können logische Ausdrücke verwendet werden, wie im Repo beschrieben. Mehrere nacheinander Queries addieren sich. Wenn beim Filtern können mehrere Actions übereinander liegen, wenn sie dieselben Nodes betreffen, ist nur die zuletzt getätigte sichtbar. Transparency war bei mir oft nicht sichtbar.
 
 Der Metadata-Explorer (rechts) zeigt die Metadata-Typen, die in dem aktuellen Graph enthalten sind: z.B. Color, Transcripts, Gene und Exon. Bei großen Graphen kann das Laden länger dauern. Der Explorer zeigt die unique values der Metadaten. Durch anklicken werden sie in das Query-Feld geschrieben. Wenn eine annot.file eingegeben wird, wird das genes: Feld befüllt, das mit Gene(X) gefiltert werden kann. Wenn Transcript-Files ohne annotations-file verwendet wurden wie bei mir, kann nach der TranscriptID gefiltert werden. 
 
-Im folgenden zu sehen sind zwei 
+In folgendem Screenshot sind ein Transcript und eine sample des bigger_test geladen worden. 
+rot = Nodes, die nur im Transcript sind
+schwarz = Nodes, die nur im sample sind
+grün = Nodes, die in beiden sind
+
+![Alt-Text](/bilder/image.png)
+
+### To do
+
+Den als Exon eingegebenen Transcripts wird eine ExonID angehangen, sodass sie nicht so zusammen gefasst werden wie gewollt. Bei Transcripts passiert das nicht. Man müsste im Code also anpassen, dass die Info aus dem gaf zu Transcript-Dateien geformt wird und die metatranscriptome_reference.fasta aus dem marbel-Output in das Datei-Format für Exons bringen.
 
 ### Troubles
 
@@ -135,6 +150,11 @@ Lösung: use another port, e.g. 8928 by typing: vizitig run -p 8928
 "Query evaluation error: metadata.id is null " im webclient
 Das passiert sobald man auf den Graph mit color ohne -m bearbeitet hat. Das lässt sich nicht rückgängig machen.
 Lösung: neuen Graph bauen und mit -m colorn, denn nachträglich mit -m colorn geht nicht
+
+
+Query für Transcript zeigt nur lose Nodes, kein zusammenhängendes Transcript
+Wenn Query z.B. ... OR Transcript(...) ist, also das Transcript zusätzlich zu anderen Nodes geladen werden sollte, scheitert es an den Obergrenze für Nodes, die auf einmal gefetched werden können (1000). 
+Lösung: Transcript(...) einfach noch mal separat fetchen, es wird dann zusätzlich zu den anderen Nodes angezeigt.
 
 
 unexpected symbols: 
